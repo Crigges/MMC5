@@ -1,3 +1,84 @@
 package Main
 
+import LinkedListModule
+import HashMap
+import Helper
+import Terrain
 
+public HashMap<unit, Unit> units = new HashMap<unit, Unit>()
+	
+public class Unit
+	use LinkedListModule
+	Unit lastCollision
+	unit u
+	real mass = 1
+	vec2 startPos
+	vec2 knock = vec2(0, 0)
+	
+	construct(unit u, real mass)
+		this.u = u
+		this.mass = mass
+		units.put(u, this)
+		startPos = u.getPos()
+		
+	function addKnock(vec2 impuls)
+		knock += impuls
+		
+	function resetKnock()
+		knock = vec2(0, 0)
+		
+	function collision(Unit otherUnit)
+		lastCollision = otherUnit
+		otherUnit.lastCollision = this
+		var pos1 = u.getPos()
+		var pos2 = otherUnit.u.getPos()
+		var vel1 = knock
+		var vel2 = otherUnit.knock
+		let delta = (pos2 - pos1)
+		let deltaLen = delta.length()
+		vec2 deltaNorm
+		if deltaLen == 0
+			deltaNorm = vec2(0,1)
+		else
+			deltaNorm = delta * (1/deltaLen)
+		real speed1central = vel1.dot(deltaNorm)
+		real speed2central = vel2.dot(deltaNorm)
+		let futurePos1 = pos1 + vel1*0.01
+		let futurePos2 = pos2 + vel2*0.01
+		let futureDelta = (futurePos2 - futurePos1)
+		if futureDelta.length() < deltaLen
+			let vel1central = deltaNorm*speed1central
+			let vel2central = deltaNorm*speed2central
+			vel1 += (vel2central - vel1central) * 1
+			vel2 += (vel1central - vel2central) * 1
+			knock = vel1
+			otherUnit.knock = vel2
+		
+	static function knockback()
+		Unit curr = first
+		while curr != null
+			vec2 next = curr.u.getPos() + curr.knock
+			if isTerrainWalkable(next.x, next.y)
+				curr.u.setXY(next)
+			else
+				curr.lastCollision = null
+				curr.knock = getBounceVec(curr.knock, getPathingNormal(next))
+				next = curr.u.getPos() + (curr.knock * 2)
+				curr.u.setXY(next)
+			group g = CreateGroup()
+			GroupEnumUnitsInRange(g, next.x, next.y, 100, null)
+			unit u = FirstOfGroup(g)
+			if u != null and curr.lastCollision != units.get(u)
+				curr.collision(units.get(u))
+			curr.knock = curr.knock * (0.95 * (2 - curr.mass))
+			curr = curr.next
+			DestroyGroup(g)
+			
+	ondestroy
+		u.addAbility(LOCUST_ID)
+		u.kill()
+		
+init
+	FogEnableOff()
+	FogMaskEnableOff()
+	getTimer().startPeriodic(0.03, function  Unit.knockback)
