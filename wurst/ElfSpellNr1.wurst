@@ -32,12 +32,13 @@ init
 public class BounceMissle
 	
 
-	static constant real missleRadius = 70
+	static constant real missleRadius = 80
 	static constant real missleRange = 1000
 	static constant real missleSpeed = 30
 	static constant real missleHeight = 20
 	static constant real knockbackFactor = 10
-	static constant real zielsuchung = 1000
+	static constant real zielsuchung = 500
+	static constant real dmgamount = 50
 	
 	int bounceZahl = 5 * 4
 	boolean canmove1 = true
@@ -68,6 +69,7 @@ public class BounceMissle
 		for unit u in ENUM_GROUP
 			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive() and canmove1 == true
 				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+				owner.u.damageTarget(u, dmgamount)
 				canmove1 = false
 		if canmove1 == false
 			zielsuchung()
@@ -76,7 +78,7 @@ public class BounceMissle
 	function zielsuchung()
 		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), zielsuchung)
 		for unit u in ENUM_GROUP
-			if cango and u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive() and u.getPos().distToVec(dummy.getPos2()) > missleRadius + 30
+			if cango and u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive() and u.getPos().distToVec(dummy.getPos2()) > missleRadius + 50
 				cango = false
 				speed = vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), missleSpeed)
 		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)

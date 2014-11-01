@@ -37,6 +37,7 @@ public class GravityMissle
 	static constant real missleHeight = 20
 	static constant real gravityRadius = 1000
 	static constant real gravityConstant = 50
+	static constant real dmgamount = 50
 	
 	Fx dummy
 	vec2 speed
@@ -64,6 +65,7 @@ public class GravityMissle
 			for unit u in ENUM_GROUP
 				if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
 					units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+					owner.u.damageTarget(u, dmgamount)
 					destroy this
 					return
 		else
@@ -72,6 +74,7 @@ public class GravityMissle
 				if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
 					real gravityRelativ = (dummy.getPos2().distToVec(u.getPos()) - (gravityRadius)).abs() / 1000
 					units.get(u).addKnock(vec2(0,0).polarOffset(u.getPos().angleTo(dummy.getPos2()), gravityConstant * gravityRelativ))
+					owner.u.damageTarget(u, dmgamount * gravityRelativ)
 			dummy.setScale(3)
 			dummy.flash("Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl")
 			destroy this

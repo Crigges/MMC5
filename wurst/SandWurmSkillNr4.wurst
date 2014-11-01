@@ -35,13 +35,13 @@ public class SlowMissle
 	static constant real missleHeight = 20
 	static constant real slowDauer = 1000
 	static constant real slowFaktor = 0.001
+	static constant real dmgamount = 50
 	
 	Fx dummy
 	vec2 speed
 	Unit owner
 	timer t
 	real distance = missleRange
-	
 
 	construct(Unit caster, vec2 target)
 		owner = caster
@@ -59,6 +59,7 @@ public class SlowMissle
 		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
 		for unit u in ENUM_GROUP
 			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
+					owner.u.damageTarget(u, dmgamount)
 					doPeriodicallyTimed(0.03, 3, (CallbackCounted a) -> begin 
 						u.setMoveSpeed(u.getMoveSpeed() * slowFaktor)
 					end)

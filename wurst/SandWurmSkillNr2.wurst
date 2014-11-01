@@ -38,6 +38,7 @@ public class SplitterBomb
 	static constant real missleHeight = 20
 	static constant real missleSpeed = 	30
 	static constant real knockbackFactor = 60
+	static constant real dmgamount = 30
 	
 	vec2 target
 	Unit owner
@@ -70,6 +71,7 @@ public class SplitterBomb
 		for unit u in ENUM_GROUP
 			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
 				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+				owner.u.damageTarget(u, dmgamount)
 		distanz -= missleSpeed
 		if distanz <= 0
 			RapidFire rp = new RapidFire(dummy.getPos2(), vec2(100, 0), owner)

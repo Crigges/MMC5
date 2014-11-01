@@ -51,6 +51,9 @@ public class Normalmissle
 	static constant real missleRadius = 80
 	static constant real missleSpeed = 30
 	static constant real missleHeight = 20
+	static constant real dmgamount = 50
+	static constant real dmgamount1 = 20
+	static constant real dmgamount2 = 10
 	
 	constant real missleRange = 2000 * missleRangeConst
 	constant real knockbackFactor = 60 * knockbackConst
@@ -75,6 +78,7 @@ public class Normalmissle
 		angle ang = pos.angleTo(target)
 		dummy = new Fx(pos.withZ(missleHeight), ang, anim)
 		dummy.setScale(skalierung)
+		dummy.getDummy().setFacing(ang)
 		speed = vec2(0,0).polarOffset(ang, missleSpeed)
 		t = getTimer()
 			..setData(this castTo int)
@@ -115,6 +119,7 @@ public class Normalmissle
 		for unit u in ENUM_GROUP
 			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
 				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+				owner.u.damageTarget(u, dmgamount)
 				destroy this
 				return		
 		distance -= missleSpeed
@@ -130,6 +135,7 @@ public class Normalmissle
 		for unit u in ENUM_GROUP
 			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
 				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+				owner.u.damageTarget(u, dmgamount)
 				destroy this
 				return		
 		distance -= missleSpeed
@@ -143,6 +149,7 @@ public class Normalmissle
 		for unit u in ENUM_GROUP
 			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
 				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+				owner.u.damageTarget(u, dmgamount)
 				destroy this
 				return		
 		distance -= missleSpeed
