@@ -1,0 +1,160 @@
+package SpellAA
+
+import Fx
+import Helper
+import Main
+import ChannelAbilityPreset
+import ClosureEvents
+
+@compiletime function createSpell()
+	var def = new ChannelAbilityPreset('norE', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("Q")
+	def.presetButtonPosNormal(0, 2)
+	def.setTooltipNormal(1, "ArrowMissle [Q]")
+	def.setTooltipNormalExtended(1, "Standard Missle with light knockback - Can bounces of Walls")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNSearingArrows.blp")
+	def.presetTargetTypes(Targettype.PTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("ArrowMissle")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 10000)
+	def.setManaCost(1, 0)
+	
+@compiletime function createSpell2()
+	var def = new ChannelAbilityPreset('norS', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("Q")
+	def.presetButtonPosNormal(0, 2)
+	def.setTooltipNormal(1, "StoneMissle [Q]")
+	def.setTooltipNormalExtended(1, "Standard Missle with light knockback - Can bounces of Walls")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNSearingArrows.blp")
+	def.presetTargetTypes(Targettype.PTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("StoneMissle")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 10000)
+	def.setManaCost(1, 0)
+	
+init
+	onPointCast('norE', (unit u, int lvl, vec2 pos) -> new Normalmissle(units.get(u), pos,"Abilities\\Weapons\\ColdArrow\\ColdArrowMissile.mdl", 2))
+	onPointCast('norS', (unit u, int lvl, vec2 pos) -> new Normalmissle(units.get(u), pos,"Abilities\\Weapons\\QuillSprayMissile\\QuillSprayMissile.mdl", 3))
+	
+public class Normalmissle
+
+	static constant real missleRadius = 80
+	static constant real missleSpeed = 30
+	static constant real missleHeight = 20
+	
+	constant real missleRange = 2000 * missleRangeConst
+	constant real knockbackFactor = 60 * knockbackConst
+	
+	Fx dummy
+	vec2 speed
+	Unit owner
+	timer t
+	vec2 target
+	real missleRangeConst
+	real knockbackConst
+	real distance = missleRange
+	vec2 otherPos
+	
+
+	construct(Unit caster, vec2 target, string anim, real skalierung)
+		knockbackConst = 1
+		missleRangeConst = 1.
+		this.target = target
+		owner = caster
+		vec2 pos = caster.u.getPos()
+		angle ang = pos.angleTo(target)
+		dummy = new Fx(pos.withZ(missleHeight), ang, anim)
+		dummy.setScale(skalierung)
+		speed = vec2(0,0).polarOffset(ang, missleSpeed)
+		t = getTimer()
+			..setData(this castTo int)
+			..startPeriodic(ANIMATION_PERIOD, () -> GetExpiredTimer().getData()	castTo thistype.move2())
+		
+		
+	construct(vec2 posa, vec2 target, Unit owner, string anim)
+		this.owner = owner
+		this.otherPos = posa
+		knockbackConst = 1
+		missleRangeConst = 1.
+		this.target = target
+		angle ang = otherPos.angleTo(target)
+		dummy = new Fx(otherPos.withZ(missleHeight), ang, anim)
+		speed = vec2(0,0).polarOffset(ang, missleSpeed)
+		t = getTimer()
+			..setData(this castTo int)
+			..startPeriodic(ANIMATION_PERIOD, () -> GetExpiredTimer().getData()	castTo thistype.move())
+			
+	
+	construct(Unit caster, vec2 target, string anim, real missleRange, real knockbackConst)
+		this.knockbackConst = knockbackConst
+		missleRangeConst = missleRange
+		this.target = target
+		owner = caster
+		vec2 pos = caster.u.getPos()
+		angle ang = pos.angleTo(target)
+		dummy = new Fx(pos.withZ(missleHeight), ang, anim)
+		speed = vec2(0,0).polarOffset(ang, missleSpeed)
+		t = getTimer()
+			..setData(this castTo int)
+			..startPeriodic(ANIMATION_PERIOD, () -> GetExpiredTimer().getData()	castTo thistype.move1())
+	
+	function move()
+		speed = reflectOnTerrain(dummy,speed)
+		dummy.setXY(dummy.getPos2() + speed)
+		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
+		for unit u in ENUM_GROUP
+			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
+				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+				destroy this
+				return		
+		distance -= missleSpeed
+		if distance <= 0
+			destroy this
+	
+	function move1()
+		if terrainWalkable(dummy, speed) == false
+			destroy this
+			return
+		dummy.setXY(dummy.getPos2() + speed)
+		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
+		for unit u in ENUM_GROUP
+			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
+				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+				destroy this
+				return		
+		distance -= missleSpeed
+		if distance <= 0
+			destroy this
+			
+	function move2()
+		speed = reflectOnTerrain(dummy,speed)
+		dummy.setXY(dummy.getPos2() + speed)
+		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
+		for unit u in ENUM_GROUP
+			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
+				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+				destroy this
+				return		
+		distance -= missleSpeed
+		if distance <= 0
+			destroy this
+			
+	ondestroy
+		destroy dummy
+		t.release()
+	
+	function drehSpeed(real drehung)
+		angle dreh = drehung.asAngleDegrees()
+		speed  = vec2(0,0).polarOffset(owner.u.getPos().angleTo(this.target).op_plus(dreh), missleSpeed)
+endpackage
+

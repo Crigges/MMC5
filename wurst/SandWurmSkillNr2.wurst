@@ -1,0 +1,83 @@
+package SandWurmSkillNr2
+
+
+import Main
+import ChannelAbilityPreset
+import ClosureEvents
+import SpellAA
+import Fx
+import Helper
+import SandWurmSkillNr1
+
+@compiletime function createSpell()
+	var def = new ChannelAbilityPreset('spli', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("C")
+	def.presetButtonPosNormal(0, 2)
+	def.setTooltipNormal(1, "Firemissle [Q]")
+	def.setTooltipNormalExtended(1, "Fires a Missle, which will only explode on the targeted area. After the Missle explodes, more Missles will spawn in a circle")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNDizzy.blp")
+	def.presetTargetTypes(Targettype.PTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("SplitterBomb")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 10000)
+	def.setManaCost(1, 0)
+	
+init
+	onPointCast('spli', (unit u, int lvl, vec2 pos) -> new SplitterBomb(units.get(u), pos))
+	
+public class SplitterBomb
+
+	static constant real missleTime  = 0.05
+	static constant real missleRange = 1000
+	static constant real missleRadius = 80
+	static constant real missleHeight = 20
+	static constant real missleSpeed = 	30
+	static constant real knockbackFactor = 60
+	
+	vec2 target
+	Unit owner
+	timer t
+	Fx dummy
+	vec2 speed
+	
+	real distanz = 0
+	
+
+	construct(Unit caster, vec2 target)
+		distanz = caster.u.getPos().distToVec(target)
+		this.target = target
+		owner = caster
+		vec2 pos = caster.u.getPos()
+		angle ang = pos.angleTo(target)
+		dummy = new Fx(pos.withZ(missleHeight), ang, "Abilities\\Weapons\\Mortar\\MortarMissile.mdl")
+		speed = vec2(0,0).polarOffset(ang, missleSpeed)
+		this.target = target
+		owner = caster
+		t = getTimer()
+			..setData(this castTo int)
+			..startPeriodic(ANIMATION_PERIOD, () -> GetExpiredTimer().getData()	castTo thistype.move())
+			
+	
+	function move()
+		speed = reflectOnTerrain(dummy, speed)
+		dummy.setXY(dummy.getPos2() + speed)
+		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
+		for unit u in ENUM_GROUP
+			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
+				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+		distanz -= missleSpeed
+		if distanz <= 0
+			RapidFire rp = new RapidFire(dummy.getPos2(), vec2(100, 0), owner)
+			destroy this
+				
+	ondestroy
+		destroy dummy
+		t.release()
+		
+endpackage
+

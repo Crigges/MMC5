@@ -1,0 +1,87 @@
+package ElfSpellNr3
+
+
+import Fx
+import Main
+import ChannelAbilityPreset
+import ClosureEvents
+import Helper
+
+@compiletime function createSpell()
+	var def = new ChannelAbilityPreset('grav', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("W")
+	def.presetButtonPosNormal(0, 2)
+	def.setTooltipNormal(1, "GravityMissle [Q]")
+	def.setTooltipNormalExtended(1, "Fires a Missle, which explodes when hitting a Player, or when it hits a wall. When it hits a wall, everybody will get pulled to the missle, the strengh of the pull depends on the distance between missle and player")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNWispSplode.blp")
+	def.presetTargetTypes(Targettype.PTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("GravityMissle")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 10000)
+	def.setManaCost(1, 0)
+	
+init
+	onPointCast('grav', (unit u, int lvl, vec2 pos) -> new GravityMissle(units.get(u), pos))
+	
+public class GravityMissle
+
+	static constant real knockbackFactor = 60
+	static constant real missleRadius = 80
+	static constant real missleRange = 2000
+	static constant real missleSpeed = 30
+	static constant real missleHeight = 20
+	static constant real gravityRadius = 1000
+	static constant real gravityConstant = 50
+	
+	Fx dummy
+	vec2 speed
+	Unit owner
+	timer t
+	real distance = missleRange
+	
+
+	construct(Unit caster, vec2 target)
+		owner = caster
+		vec2 pos = caster.u.getPos()
+		angle ang = pos.angleTo(target)
+		dummy = new Fx(pos.withZ(missleHeight), ang, "Abilities\\Spells\\Other\\BlackArrow\\BlackArrowMissile.mdl")
+		dummy.setScale(2)
+		speed = vec2(0,0).polarOffset(ang, missleSpeed)
+		t = getTimer()
+			..setData(this castTo int)
+			..startPeriodic(ANIMATION_PERIOD, () -> GetExpiredTimer().getData()	castTo thistype.move())
+			
+	
+	function move()
+		if terrainWalkable(dummy, speed)
+			dummy.setXY(dummy.getPos2() + speed)
+			ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
+			for unit u in ENUM_GROUP
+				if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
+					units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+					destroy this
+					return
+		else
+			ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), gravityRadius)
+			for unit u in ENUM_GROUP
+				if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
+					real gravityRelativ = (dummy.getPos2().distToVec(u.getPos()) - (gravityRadius)).abs() / 1000
+					units.get(u).addKnock(vec2(0,0).polarOffset(u.getPos().angleTo(dummy.getPos2()), gravityConstant * gravityRelativ))
+			dummy.setScale(3)
+			dummy.flash("Abilities\\Spells\\Demon\\DemonBoltImpact\\DemonBoltImpact.mdl")
+			destroy this
+			return		
+		distance -= missleSpeed
+		if distance <= 0
+			destroy this
+	ondestroy
+		destroy dummy
+		t.release()
+		
+endpackage
+

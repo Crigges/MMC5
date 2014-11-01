@@ -7,6 +7,23 @@ import Terrain
 
 public HashMap<unit, Unit> units = new HashMap<unit, Unit>()
 	
+	
+function createElf(player p, vec2 pos, real angle) returns Unit
+		unit u = CreateUnit(p, 'earc', pos.x, pos.y, angle)
+		u.addAbility('norE')
+		u.addAbility('boun')
+		u.addAbility('grav')
+		u.addAbility('dash')
+		return new Unit(u, 1)
+
+function createSandWurm(player p, vec2 pos, real angle) returns Unit
+		unit u = CreateUnit(p, 'earc', pos.x, pos.y, angle)
+		u.addAbility('norS')
+		u.addAbility('rapi')
+		u.addAbility('spli')
+		u.addAbility('slow')
+		return new Unit(u, 1)
+			
 public class Unit
 	use LinkedListModule
 	Unit lastCollision
@@ -77,8 +94,14 @@ public class Unit
 	ondestroy
 		u.addAbility(LOCUST_ID)
 		u.kill()
-		
+
 init
-	FogEnableOff()
-	FogMaskEnableOff()
-	getTimer().startPeriodic(0.03, function  Unit.knockback)
+		FogEnableOff()
+		FogMaskEnableOff()
+		getTimer().startPeriodic(0.03, function  Unit.knockback)
+		createElf(Player(0), vec2(0,0), 0)
+		createElf(Player(1), vec2(0,0), 0)
+		createElf(Player(1), vec2(0,0), 0)
+		createSandWurm(Player(0), vec2(0,0), 0)
+		createSandWurm(Player(1), vec2(0,0), 0)
+		createSandWurm(Player(1), vec2(0,0), 0)
