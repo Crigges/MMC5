@@ -1,0 +1,93 @@
+package SpellNr1
+
+
+import Main
+import Fx
+import ClosureEvents
+import ChannelAbilityPreset
+
+
+@compiletime function createSpell()
+	var def = new ChannelAbilityPreset('boun', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("D")
+	def.presetButtonPosNormal(2, 1)
+	def.setTooltipNormal(1, "BounceMissle [D]")
+	def.setTooltipNormalExtended(1, "Fires a Missle, which splits into other missles, if the enemy was hit")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNFireBolt.blp")
+	def.presetTargetTypes(Targettype.PTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("BounceMissle")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 5)
+	def.setCastRange(1, 10000)
+	def.setManaCost(1, 0)
+		
+init
+	onPointCast('boun', (unit u, int lvl, vec2 pos) -> new BounceMissle(units.get(u), pos))
+	
+public class BounceMissle
+	
+
+	static constant real missleRadius = 100
+	static constant real missleRange = 1500
+	static constant real missleSpeed = 30
+	static constant real missleHeight = 20
+	static constant real knockbackFactor = 30
+	static constant real zielsuchung = 500
+	
+	static int bounceZahl = 5
+	
+	Fx dummy
+	vec2 speed
+	Unit owner
+	timer t
+	real distance = missleRange
+
+	construct(Unit caster, vec2 target)
+		owner = caster
+		vec2 pos = caster.u.getPos()
+		angle ang = pos.angleTo(target)
+		dummy = new Fx(pos.withZ(missleHeight), ang, "Abilities\\Weapons\\GreenDragonMissile\\GreenDragonMissile.mdl")
+		speed = vec2(0,0).polarOffset(ang, missleSpeed)
+		t = getTimer()
+			..setData(this castTo int)
+			..startPeriodic(ANIMATION_PERIOD, () -> GetExpiredTimer().getData()	castTo thistype.move())
+		
+	
+	function move()
+		dummy.setXY(dummy.getPos2() + speed)
+		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
+		distance -= missleSpeed	
+		if distance < 0
+			destroy this
+		for unit u in ENUM_GROUP
+			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
+				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
+				bounceZahl--	
+				
+	
+	function zielsuchung()
+		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), zielsuchung)
+		for unit u in ENUM_GROUP
+			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()
+				speed = vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), missleSpeed)
+				ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
+				for unit ui in ENUM_GROUP
+					if ui.getOwner().isEnemyOf(owner.u.getOwner()) and ui.isAlive()
+						units.get(ui).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(ui.getPos()), knockbackFactor))
+						bounceZahl--
+						if bounceZahl == 0
+						destroy this
+	
+	ondestroy
+		destroy dummy
+		t.release()
+		
+	
+
+	
+
+	
