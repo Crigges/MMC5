@@ -22,7 +22,7 @@ import Helper
 	def.setName("BounceMissle")
 	def.setLevelSkipRequirement(0)
 	def.setRequiredLevel(0)
-	def.setCooldown(1, 10)
+	def.setCooldown(1, 11)
 	def.setCastRange(1, 3000)
 	def.setManaCost(1, 0)
 		
@@ -71,7 +71,10 @@ public class BounceMissle
 				units.get(u).addKnock(vec2(0,0).polarOffset(dummy.getPos2().angleTo(u.getPos()), knockbackFactor))
 				owner.u.damageTarget(u, dmgamount)
 				canmove1 = false
-		if canmove1 == false
+		if distance <= 0
+			destroy this
+			return
+		if canmove1 == false 
 			zielsuchung()
 				
 	
@@ -89,8 +92,6 @@ public class BounceMissle
 				bounceZahl--
 		if bounceZahl <= 0
 				destroy this
-		if distance <= 0
-			destroy this
 	
 	ondestroy
 		destroy dummy

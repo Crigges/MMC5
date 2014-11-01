@@ -23,7 +23,7 @@ import SandWurmSkillNr1
 	def.setName("SplitterBomb")
 	def.setLevelSkipRequirement(0)
 	def.setRequiredLevel(0)
-	def.setCooldown(1, 2)
+	def.setCooldown(1, 9)
 	def.setCastRange(1, 10000)
 	def.setManaCost(1, 0)
 	

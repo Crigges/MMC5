@@ -20,7 +20,7 @@ import ClosureTimers
 	def.setName("SlowMissle")
 	def.setLevelSkipRequirement(0)
 	def.setRequiredLevel(0)
-	def.setCooldown(1, 8)
+	def.setCooldown(1, 14)
 	def.setCastRange(1, 10000)
 	def.setManaCost(1, 0)
 	

@@ -21,7 +21,7 @@ import Helper
 	def.setName("GravityMissle")
 	def.setLevelSkipRequirement(0)
 	def.setRequiredLevel(0)
-	def.setCooldown(1, 2)
+	def.setCooldown(1, 5)
 	def.setCastRange(1, 10000)
 	def.setManaCost(1, 0)
 	
@@ -52,6 +52,7 @@ public class GravityMissle
 		angle ang = pos.angleTo(target)
 		dummy = new Fx(pos.withZ(missleHeight), ang, "Abilities\\Spells\\Other\\BlackArrow\\BlackArrowMissile.mdl")
 		dummy.setScale(2)
+		dummy.getDummy().setFacing(ang)
 		speed = vec2(0,0).polarOffset(ang, missleSpeed)
 		t = getTimer()
 			..setData(this castTo int)

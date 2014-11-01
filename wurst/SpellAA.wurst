@@ -147,6 +147,7 @@ public class Normalmissle
 	function move2()
 		speed = reflectOnTerrain(dummy,speed)
 		dummy.setXY(dummy.getPos2() + speed)
+		dummy.getDummy().setFacing(vec2(0,0).angleTo(speed))
 		ENUM_GROUP.enumUnitsInRange(dummy.getPos2(), missleRadius)
 		for unit u in ENUM_GROUP
 			if u.getOwner().isEnemyOf(owner.u.getOwner()) and u.isAlive()

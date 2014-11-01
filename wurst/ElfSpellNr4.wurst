@@ -20,7 +20,7 @@ import ClosureEvents
 	def.setName("Dash")
 	def.setLevelSkipRequirement(0)
 	def.setRequiredLevel(0)
-	def.setCooldown(1, 4)
+	def.setCooldown(1, 7)
 	def.setCastRange(1, 10000)
 	def.setManaCost(1, 0)
 	
