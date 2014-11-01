@@ -32,6 +32,19 @@ package Helper
 		else
 			return getBounceVec(vel, getPathingNormal(pos))
 			
+	public function terrainWalkable(Fx bla, vec2 vel, real anzahlschritte) returns boolean
+		vec2 pos = bla.getPos2() + vel * anzahlschritte
+		if isTerrainWalkable(pos.x, pos.y)
+			return 	true
+		else
+			return false
+	
+	public function terrainWalkable(Fx bla, vec2 vel) returns boolean
+		vec2 pos = bla.getPos2() + vel
+		if isTerrainWalkable(pos.x, pos.y)
+			return 	true
+		else
+			return false
 			
 			
 			

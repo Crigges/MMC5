@@ -1,0 +1,76 @@
+package SandWurmSkillNr1
+
+
+import Fx
+import Main
+import ChannelAbilityPreset
+import ClosureEvents
+import SpellAA
+
+@compiletime function createSpell()
+	var def = new ChannelAbilityPreset('rapi', 10)
+	def.setLevels(1)
+	def.removeChannelProperties(true)
+	def.setHotkeyNormal("E")
+	def.presetButtonPosNormal(0, 2)
+	def.setTooltipNormal(1, "RapidFire [E]")
+	def.setTooltipNormalExtended(1, "Spreads a huge amout of Fire, melting your Enemys so you can eat roasted elf")
+	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNBreathOfFire.blp")
+	def.presetTargetTypes(Targettype.PTARGET)
+	def.presetFollowThroughTime((int i) -> 0)
+	def.setName("RapidFire")
+	def.setLevelSkipRequirement(0)
+	def.setRequiredLevel(0)
+	def.setCooldown(1, 2)
+	def.setCastRange(1, 10000)
+	def.setManaCost(1, 0)
+	
+init
+	onPointCast('rapi', (unit u, int lvl, vec2 pos) -> new RapidFire(units.get(u), pos))
+	
+public class RapidFire
+
+	static constant real missleTime  = 0.05
+	
+	vec2 target
+	Unit owner
+	vec2 otherPos
+	timer t
+	real reihe = -20
+	
+
+	construct(Unit caster, vec2 target)
+		this.target = target
+		owner = caster
+		t = getTimer()
+			..setData(this castTo int)
+			..startPeriodic(missleTime, () -> GetExpiredTimer().getData()	castTo thistype.move())
+	
+	construct(vec2 pos, vec2 target, Unit caster)
+		owner = caster
+		otherPos = pos
+		this.target = target
+		t = getTimer()
+			..setData(this castTo int)
+			..startPeriodic(missleTime, () -> GetExpiredTimer().getData()	castTo thistype.move1())	
+	
+	
+	function move1()
+		Normalmissle m = new Normalmissle(otherPos, target, owner, "Abilities\\Weapons\\AncientProtectorMissile\\AncientProtectorMissile.mdl")
+		m.drehSpeed(reihe)
+		reihe += 10
+		if reihe > 360
+			destroy this
+			
+	function move()
+		Normalmissle m = new Normalmissle(owner, target, "imports\\Flamethrower.mdx", 0.5, 0.5)
+		m.drehSpeed(reihe)
+		reihe += 5
+		if reihe > 100
+			destroy this
+			
+	ondestroy
+		t.release()
+		
+endpackage
+
