@@ -1,6 +1,7 @@
 package Helper
 
 	import Terrain
+	import Fx
 	
 	public function getPathingNormal(vec2 pos) returns vec2
 		int numberOfTests = 120
@@ -22,6 +23,15 @@ package Helper
 			vec2 nvel2 = vel2
 			nvel2 += pv2
 			return nvel2
+			
+			
+	public function reflectOnTerrain(Fx bla, vec2 vel) returns vec2
+		vec2 pos = bla.getPos2() + vel
+		if isTerrainWalkable(pos.x, pos.y)
+			return vel
+		else
+			return getBounceVec(vel, getPathingNormal(pos))
+			
 			
 			
 			
