@@ -9,11 +9,11 @@ import Helper
 
 
 @compiletime function createSpell()
-	var def = new ChannelAbilityPreset('boun', 10)
+	var def = new ChannelAbilityPreset('boun', 12)
 	def.setLevels(1)
 	def.removeChannelProperties(true)
 	def.setHotkeyNormal("E")
-	def.presetButtonPosNormal(2, 1)
+	def.presetButtonPosNormal(2, 2)
 	def.setTooltipNormal(1, "BounceMissle [E]")
 	def.setTooltipNormalExtended(1, "Fires a Missle, which bounces to other Players, after it hit one")
 	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNChainLightning.blp")
@@ -23,7 +23,7 @@ import Helper
 	def.setLevelSkipRequirement(0)
 	def.setRequiredLevel(0)
 	def.setCooldown(1, 10)
-	def.setCastRange(1, 10000)
+	def.setCastRange(1, 3000)
 	def.setManaCost(1, 0)
 		
 init
@@ -36,9 +36,9 @@ public class BounceMissle
 	static constant real missleRange = 1000
 	static constant real missleSpeed = 30
 	static constant real missleHeight = 20
-	static constant real knockbackFactor = 10
+	static constant real knockbackFactor = 5
 	static constant real zielsuchung = 500
-	static constant real dmgamount = 50
+	static constant real dmgamount = 40
 	
 	int bounceZahl = 5 * 4
 	boolean canmove1 = true

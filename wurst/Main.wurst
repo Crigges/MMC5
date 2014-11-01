@@ -17,7 +17,7 @@ function createElf(player p, vec2 pos, real angle) returns Unit
 		return new Unit(u, 1)
 
 function createSandWurm(player p, vec2 pos, real angle) returns Unit
-		unit u = CreateUnit(p, 'earc', pos.x, pos.y, angle)
+		unit u = CreateUnit(p, 'e000', pos.x, pos.y, angle)
 		u.addAbility('norS')
 		u.addAbility('rapi')
 		u.addAbility('spli')

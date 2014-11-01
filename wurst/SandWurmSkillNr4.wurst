@@ -11,7 +11,7 @@ import ClosureTimers
 	def.setLevels(1)
 	def.removeChannelProperties(true)
 	def.setHotkeyNormal("R")
-	def.presetButtonPosNormal(3, 1)
+	def.presetButtonPosNormal(3,2)
 	def.setTooltipNormal(1, "SlowMissle [F]")
 	def.setTooltipNormalExtended(1, "Fires a Missle, which slows the unit")
 	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNSlow.blp")
@@ -34,8 +34,8 @@ public class SlowMissle
 	static constant real missleSpeed = 30
 	static constant real missleHeight = 20
 	static constant real slowDauer = 1000
-	static constant real slowFaktor = 0.001
-	static constant real dmgamount = 50
+	static constant real slowFaktor = 0.8
+	static constant real dmgamount = 70
 	
 	Fx dummy
 	vec2 speed

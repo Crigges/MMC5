@@ -29,7 +29,7 @@ init
 	
 class Dash
 	
-	static constant real speedyspeed = 70
+	static constant real speedyspeed = 35
 	
 	Unit owner
 	

@@ -12,7 +12,7 @@ import SpellAA
 	def.setLevels(1)
 	def.removeChannelProperties(true)
 	def.setHotkeyNormal("E")
-	def.presetButtonPosNormal(0, 2)
+	def.presetButtonPosNormal(2, 2)
 	def.setTooltipNormal(1, "RapidFire [E]")
 	def.setTooltipNormalExtended(1, "Spreads a huge amout of Fire, melting your Enemys so you can eat roasted elf")
 	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNBreathOfFire.blp")
@@ -36,7 +36,7 @@ public class RapidFire
 	Unit owner
 	vec2 otherPos
 	timer t
-	real reihe = -20
+	real reihe = -40
 	
 
 	construct(Unit caster, vec2 target)
@@ -65,8 +65,8 @@ public class RapidFire
 	function move()
 		Normalmissle m = new Normalmissle(owner, target, "Flamethrower.mdx", 0.5, 0.5)
 		m.drehSpeed(reihe)
-		reihe += 5
-		if reihe > 100
+		reihe += 2
+		if reihe >= 60
 			destroy this
 			
 	ondestroy

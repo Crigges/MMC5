@@ -12,7 +12,7 @@ import Helper
 	def.setLevels(1)
 	def.removeChannelProperties(true)
 	def.setHotkeyNormal("W")
-	def.presetButtonPosNormal(0, 2)
+	def.presetButtonPosNormal(1, 2)
 	def.setTooltipNormal(1, "GravityMissle [Q]")
 	def.setTooltipNormalExtended(1, "Fires a Missle, which explodes when hitting a Player, or when it hits a wall. When it hits a wall, everybody will get pulled to the missle, the strengh of the pull depends on the distance between missle and player")
 	def.setIconNormal("ReplaceableTextures\\CommandButtons\\BTNWispSplode.blp")
@@ -30,12 +30,12 @@ init
 	
 public class GravityMissle
 
-	static constant real knockbackFactor = 60
+	static constant real knockbackFactor = 30
 	static constant real missleRadius = 80
 	static constant real missleRange = 2000
 	static constant real missleSpeed = 30
 	static constant real missleHeight = 20
-	static constant real gravityRadius = 1000
+	static constant real gravityRadius = 800
 	static constant real gravityConstant = 50
 	static constant real dmgamount = 50
 	
